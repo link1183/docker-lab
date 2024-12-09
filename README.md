@@ -22,6 +22,103 @@ A modern web application for user management built with Flask and SQLite, contai
   - Success/error notifications
   - Keyboard navigation support
 
+## Architecture
+
+### Technical Stack
+
+#### Frontend
+
+- **HTML5/CSS3**: Modern, responsive layouts using CSS Grid and Flexbox
+- **JavaScript**: Pure vanilla JavaScript for dynamic interactions
+- **Templates**: Jinja2 templating engine for server-side rendering
+- **CSS Organization**:
+  - `layout.css`: Core layout and structural styling
+  - `components.css`: Reusable component styles
+- **JavaScript Features**:
+  - AJAX for asynchronous operations
+  - Dynamic DOM updates
+  - Modal management
+  - Form handling
+  - Real-time notifications
+
+#### Backend
+
+- **Flask**: Lightweight Python web framework
+  - Route handling
+  - Template rendering
+  - Static file serving
+- **SQLite**: File-based relational database
+  - SQL schema management
+  - Data persistence
+  - Transaction support
+- **Python Libraries**:
+  - `sqlite3`: Database operations
+  - `logging`: Application logging
+  - `os`: Environment and path management
+
+### Docker Architecture
+
+#### Container Structure
+
+1. **Development Container (`app-dev`)**:
+
+   - Python 3.11 slim base image
+   - Flask development server
+   - Development-specific packages
+   - Mock data initialization
+   - DEBUG level logging
+   - Port 8001 exposed
+
+2. **Production Container (`app-prod`)**:
+   - Same Python 3.11 slim base image
+   - Flask production server
+   - Minimal package installation
+   - Production data initialization
+   - WARNING level logging
+   - Port 8000 exposed
+
+#### Shared Resources
+
+- **Volumes**:
+  - `db-data`: Persistent storage for SQLite databases
+  - Mounted at `/app/db` in both containers
+
+#### Build Process
+
+1. **Base Stage**:
+
+   - Installs core dependencies
+   - Sets up working directory
+   - Copies application code
+
+2. **Development Stage**:
+
+   - Extends base
+   - Adds development tools
+   - Initializes test database
+
+3. **Production Stage**:
+   - Extends base
+   - Minimal overhead
+   - Initializes production database
+
+### Data Flow
+
+1. User interacts with frontend interface
+2. JavaScript handles user actions
+3. AJAX requests sent to Flask backend
+4. Flask processes requests and interacts with SQLite
+5. Results returned as JSON
+6. Frontend updates dynamically with new data
+
+### Security Considerations
+
+- Database files isolated in Docker volumes
+- Environment-specific configurations
+- Input validation on both client and server
+- SQL query parameterization
+- Error handling and logging
+
 ## Prerequisites
 
 Before you begin, ensure you have installed:
