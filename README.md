@@ -31,7 +31,6 @@ A modern web application for user management built with Flask and SQLite, contai
 8. [Troubleshooting](#8-troubleshooting)
    1. [Common Issues](#81-common-issues)
    2. [Getting Help](#82-getting-help)
-9. [License](#9-license)
 
 ## 1. Features
 
@@ -299,7 +298,3 @@ If you encounter issues:
 2. Verify environment variables
 3. Ensure all prerequisites are met
 4. Clean and rebuild the containers
-
-## 9. License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
