@@ -1,19 +1,30 @@
-# SQLite-Flask Dockerized App
+# SQLite-Flask User Management System
 
-This project is a simple Python-based web server using Flask and SQLite, dockerized to run both a Test Environment (with mock data) and a Production Environment (with real data). The app serves two endpoints:
-
-- A welcome page at `/` with a link to view users.
-- An endpoint `/users` that retrieves all users from the SQLite database in JSON format.
+A modern web application for user management built with Flask and SQLite, containerized with Docker. The application provides a complete CRUD interface for managing users with separate development and production environments.
 
 ## Features
 
-- **Welcome Page**: A simple page that links to the `/users` endpoint.
-- **Users Endpoint**: The `/users` endpoint retrieves users from the database (Test or Production) and returns them in JSON format.
-- **Multiple Environments**: Test environment with mock data and Production environment with real data.
+- **User Management Interface**:
+  - View all users in a clean, responsive table
+  - Add new users with a modal form
+  - Edit existing users with pre-populated forms
+  - Delete users with confirmation
+- **Real-time Updates**:
+  - AJAX-powered operations (no page refreshes)
+  - Instant feedback with notifications
+  - Dynamic table updates
+- **Multiple Environments**:
+  - Development environment with test data
+  - Production environment with real data
+- **Modern UI/UX**:
+  - Clean, responsive design
+  - Modal dialogs for actions
+  - Success/error notifications
+  - Keyboard navigation support
 
 ## Prerequisites
 
-Before you begin, ensure that you have the following installed:
+Before you begin, ensure you have installed:
 
 - Docker (version 20.10 or newer)
 - Docker Compose (version 1.29 or newer)
@@ -22,76 +33,135 @@ Before you begin, ensure that you have the following installed:
 
 ### 1. Clone the repository
 
-First, clone the repository to your local machine:
-
 ```sh
-git clone <repository-url>
-cd <repository-directory>
+git clone https://github.com/link1183/docker-lab
+cd docker-lab
 ```
 
 ### 2. Build and run with Docker Compose
 
-You can build and run the app with Docker Compose. This will create and start both the test and production containers.
-
 ```sh
-docker-compose up --build
+docker compose up -d --build
 ```
 
 This command will:
 
-- Build the images for both test and production environments.
-- Set up and start containers for both environments.
+- Build images for both environments
+- Create and start the containers
+- Mount necessary volumes for database persistence
 - Expose the following ports:
-  - Test Environment: [http://localhost:8001](http://localhost:8001) (mock data).
-  - Production Environment: [http://localhost:8000](http://localhost:8000) (real data).
+  - Production Environment: [http://localhost:8000](http://localhost:8000)
+  - Development Environment: [http://localhost:8001](http://localhost:8001)
 
-### 3. Access the App
+### 3. Access the Application
 
-- Visit [http://localhost:8000](http://localhost:8000) for the production environment.
-- Visit [http://localhost:8001](http://localhost:8001) for the test environment.
+- Production: [http://localhost:8000](http://localhost:8000)
+- Development: [http://localhost:8001](http://localhost:8001)
 
-Both environments will show the same welcome page with a link to view users.
+Each environment provides:
 
-### 4. Stopping the App
+- Dashboard with environment info and statistics
+- Complete user management interface
+- Separate database instance
 
-To stop the running containers, use the following command:
+### 4. Managing the Application
+
+**Stop the application:**
 
 ```sh
-docker-compose down
+docker compose down
 ```
 
-This will stop and remove the containers, networks, and volumes created by Docker Compose.
+**Stop and remove volumes (cleans database):**
 
-## Dockerfile Breakdown
+```sh
+docker compose down -v
+```
 
-This project uses a multi-stage Dockerfile to create separate environments for Test and Production:
+**View logs:**
 
-- **Base Image**:
+```sh
+docker compose logs -f app-dev app-prod
+```
 
-  - Installs Python 3.11, SQLite, and app dependencies.
-  - Copies the Flask app code and the `requirements.txt` file.
+## Project Structure
 
-- **Test Environment**:
-
-  - Creates a SQLite database (`test.db`) with mock data for testing purposes.
-  - Sets the environment variable `ENV=test` and points to the `test.db` file.
-
-- **Production Environment**:
-  - Creates a SQLite database (`prod.db`) with real data.
-  - Sets the environment variable `ENV=production` and points to the `prod.db` file.
+```
+.
+├── app.py                 # Main Flask application
+├── db/                    # Database files and SQL scripts
+│   ├── dev-data.sql      # Development data initialization
+│   └── prod-data.sql     # Production data initialization
+├── public/               # Frontend assets
+│   ├── static/           # Static files
+│   │   ├── css/         # Stylesheets
+│   │   └── js/          # JavaScript files
+│   └── templates/        # Jinja2 templates
+├── docker-compose.yml    # Docker Compose configuration
+├── Dockerfile           # Multi-stage Docker build
+└── requirements.txt     # Python dependencies
+```
 
 ## Environment Variables
 
-The application uses the following environment variables:
+The application uses these environment variables:
 
-- `DB_PATH`: Path to the SQLite database file. Default is `test.db` (for test environment).
-- `ENV`: The environment type. Can be either `test` or `production`.
-- `LOG_LEVEL`: Logging level. Set this to `DEBUG`, `INFO`, or `ERROR`.
+- `DB_PATH`: Path to the SQLite database file
+- `ENV`: Environment type (`development` or `production`)
+- `LOG_LEVEL`: Logging level (`DEBUG`, `INFO`, or `WARNING`)
+- `SQL_FILE`: SQL file for database initialization
+
+## Development
+
+### Database Initialization
+
+Database initialization happens at container startup:
+
+- Development data is loaded from `db/dev-data.sql`
+- Production data is loaded from `db/prod-data.sql`
+- Data persists between container restarts via Docker volumes
+
+### Adding New Features
+
+1. Frontend:
+
+   - Templates are in `public/templates/`
+   - CSS styles are split into layout and components
+   - JavaScript handles all dynamic interactions
+
+2. Backend:
+   - Add new routes in `app.py`
+   - Update SQL scripts in `db/` for new schemas
+   - Follow the existing pattern for AJAX responses
 
 ## Troubleshooting
 
-- **App not starting?** Ensure that Docker and Docker Compose are installed correctly, and try rebuilding the images with `docker-compose up --build`.
-- **Database connection errors?** Verify that the environment variables are set correctly and that the database files are accessible.
+### Common Issues
+
+1. **Modals not working:**
+
+   - Check browser console for JavaScript errors
+   - Verify that main.js is loaded properly
+
+2. **Database errors:**
+
+   - Ensure proper permissions on db directory
+   - Check container logs for SQL errors
+   - Verify SQL file syntax
+
+3. **Container issues:**
+   - Run `docker compose down -v` to clean state
+   - Rebuild with `docker compose up -d --build`
+   - Check logs with `docker compose logs`
+
+### Getting Help
+
+If you encounter issues:
+
+1. Check the application logs
+2. Verify environment variables
+3. Ensure all prerequisites are met
+4. Clean and rebuild the containers
 
 ## License
 
