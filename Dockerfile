@@ -13,38 +13,46 @@ COPY ./app.py requirements.txt /app/
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy init script
+COPY init-db.sh /app/
+RUN chmod +x /app/init-db.sh
+
 # Stage 2: Development Environment (Dev)
 FROM base AS dev
 
-# Install development dependencies (add dev packages here)
+# Install development dependencies
 COPY requirements-dev.txt /app/requirements-dev.txt
 RUN pip install --no-cache-dir -r requirements-dev.txt
 
-# Copy the dev SQL file
+# Copy the dev SQL file and ensure permissions
 COPY db/dev-data.sql /app/dev-data.sql
-
-# Execute the dev SQL file to create and populate the database
-RUN sqlite3 /app/dev-data.db < /app/dev-data.sql && echo "SQL executed"
+RUN chmod 644 /app/dev-data.sql
 
 # Set environment variables for Dev
 ENV ENV=dev
 ENV LOG_LEVEL=DEBUG
+ENV SQL_FILE=dev-data.sql
+
+# Create db directory with proper permissions
+RUN mkdir -p /app/db && chmod 777 /app/db
 
 # Command for the development environment
-CMD ["python", "app.py"]
+CMD ["/app/init-db.sh"]
 
 # Stage 3: Production Environment
 FROM base AS prod
 
-# Copy the prod SQL file
+# Copy the prod SQL file and ensure permissions
 COPY db/prod-data.sql /app/prod-data.sql
-
-# Execute the prod SQL file to create and populate the database
-RUN sqlite3 /app/prod-data.db < /app/prod-data.sql && echo "SQL executed"
+RUN chmod 644 /app/prod-data.sql
 
 # Set environment variables for Prod
 ENV ENV=production
 ENV LOG_LEVEL=WARNING
+ENV SQL_FILE=prod-data.sql
+
+# Create db directory with proper permissions
+RUN mkdir -p /app/db && chmod 777 /app/db
 
 # Command for the production environment
-CMD ["python", "app.py"]
+CMD ["/app/init-db.sh"]
