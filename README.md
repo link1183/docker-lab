@@ -13,9 +13,9 @@ A modern web application for user management built with Flask and SQLite, contai
   - AJAX-powered operations (no page refreshes)
   - Instant feedback with notifications
   - Dynamic table updates
-- **Multiple Environments**:
-  - Development environment with test data
-  - Production environment with real data
+- **Environment-Specific Configurations**:
+  - Development environment optimized for debugging
+  - Production environment optimized for performance and security
 - **Modern UI/UX**:
   - Clean, responsive design
   - Modal dialogs for actions
@@ -56,51 +56,76 @@ A modern web application for user management built with Flask and SQLite, contai
   - `logging`: Application logging
   - `os`: Environment and path management
 
+### Environment-Specific Architecture
+
+#### Development Environment (`app-dev`)
+
+- **Server**: Flask Development Server
+  - Built-in reloader
+  - Detailed debugging information
+  - Development-oriented error pages
+- **Configuration**:
+  - DEBUG level logging
+  - Development-specific database with test data
+  - Port 8001 exposed
+- **Features**:
+  - Extended error messages
+  - Development-friendly debugging
+  - Mock data for testing
+  - Direct code execution
+
+#### Production Environment (`app-prod`)
+
+- **Server**: Gunicorn WSGI Server
+  - 4 worker processes
+  - Production-grade performance
+  - Process management
+  - Error handling
+- **Security**:
+  - Non-root user execution
+  - Restricted permissions
+  - Minimal dependencies
+- **Configuration**:
+  - WARNING level logging
+  - Production database
+  - Port 8000 exposed
+  - Output capture for logging
+- **Features**:
+  - Optimized for performance
+  - Process management
+  - Load balancing
+  - Production logging
+
 ### Docker Architecture
 
 #### Container Structure
 
-1. **Development Container (`app-dev`)**:
+1. **Base Image (Common)**:
 
-   - Python 3.11 slim base image
-   - Flask development server
-   - Development-specific packages
+   - Python 3.11 slim image
+   - SQLite installation
+   - Core dependencies
+   - Application code
+   - Static files and templates
+
+2. **Development Specifics**:
+
+   - Additional development dependencies
    - Mock data initialization
-   - DEBUG level logging
-   - Port 8001 exposed
+   - Flask development server
+   - Debug-level logging
 
-2. **Production Container (`app-prod`)**:
-   - Same Python 3.11 slim base image
-   - Flask production server
-   - Minimal package installation
+3. **Production Specifics**:
+   - Gunicorn WSGI server
    - Production data initialization
-   - WARNING level logging
-   - Port 8000 exposed
+   - Non-root user execution
+   - Warning-level logging
 
 #### Shared Resources
 
 - **Volumes**:
   - `db-data`: Persistent storage for SQLite databases
   - Mounted at `/app/db` in both containers
-
-#### Build Process
-
-1. **Base Stage**:
-
-   - Installs core dependencies
-   - Sets up working directory
-   - Copies application code
-
-2. **Development Stage**:
-
-   - Extends base
-   - Adds development tools
-   - Initializes test database
-
-3. **Production Stage**:
-   - Extends base
-   - Minimal overhead
-   - Initializes production database
 
 ### Data Flow
 
@@ -115,6 +140,10 @@ A modern web application for user management built with Flask and SQLite, contai
 
 - Database files isolated in Docker volumes
 - Environment-specific configurations
+- Production-specific security measures:
+  - Non-root user execution
+  - Restricted file permissions
+  - Minimal attack surface
 - Input validation on both client and server
 - SQL query parameterization
 - Error handling and logging
