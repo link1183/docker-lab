@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="actions">
+    <button class="btn btn-primary" onclick="showModal('addModal')">Add New User</button>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[2] }}</td>
+            <td>
+                <button class="btn btn-warning" 
+                    onclick="populateEditForm('{{ user[0] }}', '{{ user[1] }}', '{{ user[2] }}')">
+                    Edit
+                </button>
+                <button class="btn btn-danger" 
+                    onclick="confirmDelete('{{ user[0] }}')">
+                    Delete
+                </button>
+                <form id="delete-form-{{ user[0] }}" action="/users/{{ user[0] }}/delete" method="POST" style="display: none;"></form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block modals %}
+<!-- Add User Modal -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <button type="button" class="close" onclick="hideModal('addModal')">&times;</button>
+        <h2>Add New User</h2>
+        <form action="/users/add" method="POST">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="actions">
+                <button type="button" class="btn" onclick="hideModal('addModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <button type="button" class="close" onclick="hideModal('editModal')">&times;</button>
+        <h2>Edit User</h2>
+        <form action="/users/edit" method="POST">
+            <input type="hidden" id="edit-id" name="id">
+            <div class="form-group">
+                <label for="edit-name">Name:</label>
+                <input type="text" id="edit-name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-email">Email:</label>
+                <input type="email" id="edit-email" name="email" required>
+            </div>
+            <div class="actions">
+                <button type="button" class="btn" onclick="hideModal('editModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -7,8 +7,9 @@ RUN apt-get update && apt-get install -y sqlite3 && rm -rf /var/lib/apt/lists/*
 # Create a working directory
 WORKDIR /app
 
-# Copy application code and requirements
+# Copy application code, requirements, and public directory
 COPY ./app.py requirements.txt /app/
+COPY ./public /app/public/
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt

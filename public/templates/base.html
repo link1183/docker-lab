@@ -1,0 +1,38 @@
+<!-- public/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}User Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <h1>User Management System</h1>
+        
+        <div class="nav">
+            <span class="environment {{ 'env-prod' if env == 'production' else 'env-dev' }}">
+                {{ env.upper() }} Environment
+            </span>
+            | <a href="/">Home</a> | <a href="/users">View Users</a>
+        </div>
+
+        {% if success %}
+            <div class="success-message">{{ success }}</div>
+        {% endif %}
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block modals %}{% endblock %}
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
