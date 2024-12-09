@@ -2,29 +2,27 @@
 
 A modern web application for user management built with Flask and SQLite, containerized with Docker. The application provides a complete CRUD interface for managing users with separate development and production environments.
 
-> 📚 **Documentation**: Check out our [Wiki](../../wiki) for comprehensive documentation
-
 ## Table of Contents
 
-1. [Features](#1-features)
-2. [Architecture](#2-architecture)
-   1. [Technical Stack](#21-technical-stack)
+1. [Prerequisites](#1-prerequisites)
+2. [Setup](#2-setup)
+   1. [Clone Repository](#21-clone-repository)
+   2. [Build and Run](#22-build-and-run)
+   3. [Access Application](#23-access-application)
+   4. [Managing Application](#24-managing-application)
+3. [Features](#3-features)
+4. [Architecture](#4-architecture)
+   1. [Technical Stack](#41-technical-stack)
       - [Frontend](#frontend)
       - [Backend](#backend)
-   2. [Environment-Specific Architecture](#22-environment-specific-architecture)
+   2. [Environment-Specific Architecture](#42-environment-specific-architecture)
       - [Development Environment](#development-environment-app-dev)
       - [Production Environment](#production-environment-app-prod)
-   3. [Docker Architecture](#23-docker-architecture)
+   3. [Docker Architecture](#43-docker-architecture)
       - [Container Structure](#container-structure)
       - [Shared Resources](#shared-resources)
-   4. [Data Flow](#24-data-flow)
-   5. [Security Considerations](#25-security-considerations)
-3. [Prerequisites](#3-prerequisites)
-4. [Setup](#4-setup)
-   1. [Clone Repository](#41-clone-repository)
-   2. [Build and Run](#42-build-and-run)
-   3. [Access Application](#43-access-application)
-   4. [Managing Application](#44-managing-application)
+   4. [Data Flow](#44-data-flow)
+   5. [Security Considerations](#45-security-considerations)
 5. [Project Structure](#5-project-structure)
 6. [Environment Variables](#6-environment-variables)
 7. [Development](#7-development)
@@ -34,7 +32,47 @@ A modern web application for user management built with Flask and SQLite, contai
    1. [Common Issues](#81-common-issues)
    2. [Getting Help](#82-getting-help)
 
-## 1. Features
+## 1. Prerequisites
+
+Before you begin, ensure you have installed:
+
+- Docker (version 20.10 or newer)
+- Docker Compose (version 1.29 or newer)
+
+## 2. Setup
+
+### 2.1 Clone Repository
+
+```sh
+git clone https://github.com/link1183/docker-lab
+cd docker-lab
+```
+
+### 2.2 Build and Run
+
+```sh
+docker compose up -d --build
+```
+
+### 2.3 Access Application
+
+- Production: [http://localhost:8000](http://localhost:8000)
+- Development: [http://localhost:8001](http://localhost:8001)
+
+### 2.4 Managing Application
+
+```sh
+# Stop the application
+docker compose down
+
+# Stop and remove volumes
+docker compose down -v
+
+# View logs
+docker compose logs -f app-dev app-prod
+```
+
+## 3. Features
 
 - **User Management Interface**:
   - View all users in a clean, responsive table
@@ -54,9 +92,9 @@ A modern web application for user management built with Flask and SQLite, contai
   - Success/error notifications
   - Keyboard navigation support
 
-## 2. Architecture
+## 4. Architecture
 
-### 2.1 Technical Stack
+### 4.1 Technical Stack
 
 #### Frontend
 
@@ -88,7 +126,7 @@ A modern web application for user management built with Flask and SQLite, contai
   - `logging`: Application logging
   - `os`: Environment and path management
 
-### 2.2 Environment-Specific Architecture
+### 4.2 Environment-Specific Architecture
 
 #### Development Environment (`app-dev`)
 
@@ -128,7 +166,7 @@ A modern web application for user management built with Flask and SQLite, contai
   - Load balancing
   - Production logging
 
-### 2.3 Docker Architecture
+### 4.3 Docker Architecture
 
 #### Container Structure
 
@@ -159,7 +197,7 @@ A modern web application for user management built with Flask and SQLite, contai
   - `db-data`: Persistent storage for SQLite databases
   - Mounted at `/app/db` in both containers
 
-### 2.4 Data Flow
+### 4.4 Data Flow
 
 1. User interacts with frontend interface
 2. JavaScript handles user actions
@@ -168,7 +206,7 @@ A modern web application for user management built with Flask and SQLite, contai
 5. Results returned as JSON
 6. Frontend updates dynamically with new data
 
-### 2.5 Security Considerations
+### 4.5 Security Considerations
 
 - Database files isolated in Docker volumes
 - Environment-specific configurations
@@ -179,48 +217,6 @@ A modern web application for user management built with Flask and SQLite, contai
 - Input validation on both client and server
 - SQL query parameterization
 - Error handling and logging
-
-[Previous remaining sections with added numbering...]
-
-## 3. Prerequisites
-
-Before you begin, ensure you have installed:
-
-- Docker (version 20.10 or newer)
-- Docker Compose (version 1.29 or newer)
-
-## 4. Setup
-
-### 4.1 Clone Repository
-
-```sh
-git clone https://github.com/link1183/docker-lab
-cd docker-lab
-```
-
-### 4.2 Build and Run
-
-```sh
-docker compose up -d --build
-```
-
-### 4.3 Access Application
-
-- Production: [http://localhost:8000](http://localhost:8000)
-- Development: [http://localhost:8001](http://localhost:8001)
-
-### 4.4 Managing Application
-
-```sh
-# Stop the application
-docker compose down
-
-# Stop and remove volumes
-docker compose down -v
-
-# View logs
-docker compose logs -f app-dev app-prod
-```
 
 ## 5. Project Structure
 
