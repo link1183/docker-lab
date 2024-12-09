@@ -1,4 +1,5 @@
-// public/static/js/main.js
+// Track user to be deleted
+let userToDelete = null;
 
 /**
  * Show a modal dialog
@@ -8,6 +9,7 @@ function showModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
     modal.classList.add("show");
+    // Add escape key listener when modal is shown
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
         hideModal(modalId);
@@ -50,10 +52,9 @@ function updateUsersTable(users) {
                     Edit
                 </button>
                 <button class="btn btn-danger" 
-                    onclick="confirmDelete('${user[0]}')">
+                    onclick="showDeleteConfirmation('${user[0]}', '${user[1]}')">
                     Delete
                 </button>
-                <form id="delete-form-${user[0]}" action="/users/${user[0]}/delete" method="POST" style="display: none;"></form>
             </td>
         </tr>
     `,
@@ -68,6 +69,8 @@ function updateUsersTable(users) {
  */
 function showNotification(message, type = "success") {
   const container = document.querySelector(".container");
+
+  // Remove existing notifications
   const existingMessage = container.querySelector(
     ".success-message, .error-message",
   );
@@ -75,19 +78,25 @@ function showNotification(message, type = "success") {
     existingMessage.remove();
   }
 
+  // Create and insert new notification
   const messageDiv = document.createElement("div");
   messageDiv.className =
     type === "success" ? "success-message" : "error-message";
   messageDiv.textContent = message;
 
-  container.insertBefore(messageDiv, container.querySelector(".actions"));
+  // Insert after the navigation
+  const nav = container.querySelector(".nav");
+  nav.insertAdjacentElement("afterend", messageDiv);
 
-  // Remove message after 3 seconds
-  setTimeout(() => messageDiv.remove(), 3000);
+  // Auto-remove after 3 seconds
+  setTimeout(() => {
+    messageDiv.style.opacity = "0";
+    setTimeout(() => messageDiv.remove(), 300);
+  }, 3000);
 }
 
 /**
- * Handle form submission
+ * Handle form submission with AJAX
  * @param {Event} event - Form submission event
  */
 function handleFormSubmit(event) {
@@ -100,7 +109,12 @@ function handleFormSubmit(event) {
     method: form.method,
     body: formData,
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
     .then((data) => {
       if (data.error) {
         showNotification(data.error, "error");
@@ -120,28 +134,49 @@ function handleFormSubmit(event) {
 }
 
 /**
- * Confirm and handle user deletion
+ * Show delete confirmation modal
  * @param {string} userId - The ID of the user to delete
+ * @param {string} userName - The name of the user to delete
  */
-function confirmDelete(userId) {
-  if (confirm("Are you sure you want to delete this user?")) {
-    fetch(`/users/${userId}/delete`, {
-      method: "POST",
+function showDeleteConfirmation(userId, userName) {
+  userToDelete = userId;
+  const nameElement = document.getElementById("deleteUserName");
+  nameElement.textContent = userName;
+  showModal("deleteModal");
+}
+
+/**
+ * Handle the actual deletion after confirmation
+ */
+function handleDeleteConfirmation() {
+  if (!userToDelete) return;
+
+  hideModal("deleteModal");
+
+  fetch(`/users/${userToDelete}/delete`, {
+    method: "POST",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          showNotification(data.error, "error");
-        } else {
-          updateUsersTable(data.users);
-          showNotification(data.message);
-        }
-      })
-      .catch((error) => {
-        showNotification("An error occurred while deleting the user", "error");
-        console.error("Error:", error);
-      });
-  }
+    .then((data) => {
+      if (data.error) {
+        showNotification(data.error, "error");
+      } else {
+        updateUsersTable(data.users);
+        showNotification(data.message);
+      }
+    })
+    .catch((error) => {
+      showNotification("An error occurred while deleting the user", "error");
+      console.error("Error:", error);
+    })
+    .finally(() => {
+      userToDelete = null;
+    });
 }
 
 /**
@@ -157,9 +192,9 @@ function populateEditForm(userId, name, email) {
   showModal("editModal");
 }
 
-// Add event listeners when the DOM is loaded
+// Initialize all event listeners when the DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
-  // Handle modal clicks
+  // Handle modal background clicks
   const modals = document.querySelectorAll(".modal");
   modals.forEach((modal) => {
     modal.addEventListener("click", function (event) {
@@ -185,4 +220,10 @@ document.addEventListener("DOMContentLoaded", function () {
   forms.forEach((form) => {
     form.addEventListener("submit", handleFormSubmit);
   });
+
+  // Handle delete confirmation
+  const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener("click", handleDeleteConfirmation);
+  }
 });
