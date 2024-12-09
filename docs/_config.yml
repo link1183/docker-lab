@@ -1,5 +1,0 @@
-theme: jekyll-theme-cayman
-title: SQLite-Flask User Management System
-description: A modern web application for user management built with Flask and SQLite, containerized with Docker.
-show_downloads: true
-google_analytics:
