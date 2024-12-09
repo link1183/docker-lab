@@ -1,4 +1,4 @@
-# Stage 1: Base Image
+# Base Image
 FROM python:3.11-slim AS base
 
 # Install SQLite
@@ -18,7 +18,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY init-db.sh /app/
 RUN chmod +x /app/init-db.sh
 
-# Stage 2: Development Environment (Dev)
+# Create db directory with proper permissions
+RUN mkdir -p /app/db && chmod 777 /app/db
+
+# Development Environment
 FROM base AS dev
 
 # Install development dependencies
@@ -32,13 +35,10 @@ RUN chmod 644 /app/dev-data.sql
 # Set environment variables for Dev
 ENV SQL_FILE=dev-data.sql
 
-# Create db directory with proper permissions
-RUN mkdir -p /app/db && chmod 777 /app/db
-
 # Command for the development environment
 CMD ["/app/init-db.sh"]
 
-# Stage 3: Production Environment
+# Production Environment
 FROM base AS prod
 
 # Copy the prod SQL file and ensure permissions
@@ -48,8 +48,6 @@ RUN chmod 644 /app/prod-data.sql
 # Set environment variables for Prod
 ENV SQL_FILE=prod-data.sql
 
-# Create db directory with proper permissions
-RUN mkdir -p /app/db && chmod 777 /app/db
-
 # Command for the production environment
 CMD ["/app/init-db.sh"]
+
