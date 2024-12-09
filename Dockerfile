@@ -30,8 +30,6 @@ COPY db/dev-data.sql /app/dev-data.sql
 RUN chmod 644 /app/dev-data.sql
 
 # Set environment variables for Dev
-ENV ENV=dev
-ENV LOG_LEVEL=DEBUG
 ENV SQL_FILE=dev-data.sql
 
 # Create db directory with proper permissions
@@ -48,8 +46,6 @@ COPY db/prod-data.sql /app/prod-data.sql
 RUN chmod 644 /app/prod-data.sql
 
 # Set environment variables for Prod
-ENV ENV=production
-ENV LOG_LEVEL=WARNING
 ENV SQL_FILE=prod-data.sql
 
 # Create db directory with proper permissions
