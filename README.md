@@ -2,7 +2,38 @@
 
 A modern web application for user management built with Flask and SQLite, containerized with Docker. The application provides a complete CRUD interface for managing users with separate development and production environments.
 
-## Features
+## Table of Contents
+
+1. [Features](#1-features)
+2. [Architecture](#2-architecture)
+   1. [Technical Stack](#21-technical-stack)
+      - [Frontend](#frontend)
+      - [Backend](#backend)
+   2. [Environment-Specific Architecture](#22-environment-specific-architecture)
+      - [Development Environment](#development-environment-app-dev)
+      - [Production Environment](#production-environment-app-prod)
+   3. [Docker Architecture](#23-docker-architecture)
+      - [Container Structure](#container-structure)
+      - [Shared Resources](#shared-resources)
+   4. [Data Flow](#24-data-flow)
+   5. [Security Considerations](#25-security-considerations)
+3. [Prerequisites](#3-prerequisites)
+4. [Setup](#4-setup)
+   1. [Clone Repository](#41-clone-repository)
+   2. [Build and Run](#42-build-and-run)
+   3. [Access Application](#43-access-application)
+   4. [Managing Application](#44-managing-application)
+5. [Project Structure](#5-project-structure)
+6. [Environment Variables](#6-environment-variables)
+7. [Development](#7-development)
+   1. [Database Initialization](#71-database-initialization)
+   2. [Adding New Features](#72-adding-new-features)
+8. [Troubleshooting](#8-troubleshooting)
+   1. [Common Issues](#81-common-issues)
+   2. [Getting Help](#82-getting-help)
+9. [License](#9-license)
+
+## 1. Features
 
 - **User Management Interface**:
   - View all users in a clean, responsive table
@@ -22,9 +53,9 @@ A modern web application for user management built with Flask and SQLite, contai
   - Success/error notifications
   - Keyboard navigation support
 
-## Architecture
+## 2. Architecture
 
-### Technical Stack
+### 2.1 Technical Stack
 
 #### Frontend
 
@@ -56,7 +87,7 @@ A modern web application for user management built with Flask and SQLite, contai
   - `logging`: Application logging
   - `os`: Environment and path management
 
-### Environment-Specific Architecture
+### 2.2 Environment-Specific Architecture
 
 #### Development Environment (`app-dev`)
 
@@ -96,7 +127,7 @@ A modern web application for user management built with Flask and SQLite, contai
   - Load balancing
   - Production logging
 
-### Docker Architecture
+### 2.3 Docker Architecture
 
 #### Container Structure
 
@@ -127,7 +158,7 @@ A modern web application for user management built with Flask and SQLite, contai
   - `db-data`: Persistent storage for SQLite databases
   - Mounted at `/app/db` in both containers
 
-### Data Flow
+### 2.4 Data Flow
 
 1. User interacts with frontend interface
 2. JavaScript handles user actions
@@ -136,7 +167,7 @@ A modern web application for user management built with Flask and SQLite, contai
 5. Results returned as JSON
 6. Frontend updates dynamically with new data
 
-### Security Considerations
+### 2.5 Security Considerations
 
 - Database files isolated in Docker volumes
 - Environment-specific configurations
@@ -148,69 +179,49 @@ A modern web application for user management built with Flask and SQLite, contai
 - SQL query parameterization
 - Error handling and logging
 
-## Prerequisites
+[Previous remaining sections with added numbering...]
+
+## 3. Prerequisites
 
 Before you begin, ensure you have installed:
 
 - Docker (version 20.10 or newer)
 - Docker Compose (version 1.29 or newer)
 
-## Setup
+## 4. Setup
 
-### 1. Clone the repository
+### 4.1 Clone Repository
 
 ```sh
 git clone https://github.com/link1183/docker-lab
 cd docker-lab
 ```
 
-### 2. Build and run with Docker Compose
+### 4.2 Build and Run
 
 ```sh
 docker compose up -d --build
 ```
 
-This command will:
-
-- Build images for both environments
-- Create and start the containers
-- Mount necessary volumes for database persistence
-- Expose the following ports:
-  - Production Environment: [http://localhost:8000](http://localhost:8000)
-  - Development Environment: [http://localhost:8001](http://localhost:8001)
-
-### 3. Access the Application
+### 4.3 Access Application
 
 - Production: [http://localhost:8000](http://localhost:8000)
 - Development: [http://localhost:8001](http://localhost:8001)
 
-Each environment provides:
-
-- Dashboard with environment info and statistics
-- Complete user management interface
-- Separate database instance
-
-### 4. Managing the Application
-
-**Stop the application:**
+### 4.4 Managing Application
 
 ```sh
+# Stop the application
 docker compose down
-```
 
-**Stop and remove volumes (cleans database):**
-
-```sh
+# Stop and remove volumes
 docker compose down -v
-```
 
-**View logs:**
-
-```sh
+# View logs
 docker compose logs -f app-dev app-prod
 ```
 
-## Project Structure
+## 5. Project Structure
 
 ```
 .
@@ -228,7 +239,7 @@ docker compose logs -f app-dev app-prod
 └── requirements.txt     # Python dependencies
 ```
 
-## Environment Variables
+## 6. Environment Variables
 
 The application uses these environment variables:
 
@@ -237,9 +248,9 @@ The application uses these environment variables:
 - `LOG_LEVEL`: Logging level (`DEBUG`, `INFO`, or `WARNING`)
 - `SQL_FILE`: SQL file for database initialization
 
-## Development
+## 7. Development
 
-### Database Initialization
+### 7.1 Database Initialization
 
 Database initialization happens at container startup:
 
@@ -247,7 +258,7 @@ Database initialization happens at container startup:
 - Production data is loaded from `db/prod-data.sql`
 - Data persists between container restarts via Docker volumes
 
-### Adding New Features
+### 7.2 Adding New Features
 
 1. Frontend:
 
@@ -260,9 +271,9 @@ Database initialization happens at container startup:
    - Update SQL scripts in `db/` for new schemas
    - Follow the existing pattern for AJAX responses
 
-## Troubleshooting
+## 8. Troubleshooting
 
-### Common Issues
+### 8.1 Common Issues
 
 1. **Modals not working:**
 
@@ -280,7 +291,7 @@ Database initialization happens at container startup:
    - Rebuild with `docker compose up -d --build`
    - Check logs with `docker compose logs`
 
-### Getting Help
+### 8.2 Getting Help
 
 If you encounter issues:
 
@@ -289,6 +300,6 @@ If you encounter issues:
 3. Ensure all prerequisites are met
 4. Clean and rebuild the containers
 
-## License
+## 9. License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
