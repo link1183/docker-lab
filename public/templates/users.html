@@ -5,38 +5,58 @@
     <button class="btn btn-primary" onclick="showModal('addModal')">Add New User</button>
 </div>
 
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{ user[0] }}</td>
-            <td>{{ user[1] }}</td>
-            <td>{{ user[2] }}</td>
-            <td>
-                <button class="btn btn-warning" 
-                    onclick="populateEditForm('{{ user[0] }}', '{{ user[1] }}', '{{ user[2] }}')">
-                    Edit
-                </button>
-                <button class="btn btn-danger" 
-                    onclick="showDeleteConfirmation('{{ user[0] }}', '{{ user[1] }}')">
-                    Delete
-                </button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock %}
+<div id="users-container">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
+                <td>
+                    <button class="btn btn-warning" 
+                        onclick="populateEditForm('{{ user[0] }}', '{{ user[1] }}', '{{ user[2] }}')">
+                        Edit
+                    </button>
+                    <button class="btn btn-danger" 
+                        onclick="showDeleteConfirmation('{{ user[0] }}', '{{ user[1] }}')">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-{% block modals %}
+    <div class="pagination">
+        {% if total_pages > 1 %}
+            {% if current_page > 1 %}
+            <a href="#" onclick="loadPage({{ current_page-1 }}); return false;" class="btn">&laquo; Previous</a>
+            {% endif %}
+            
+            {% for p in range(1, total_pages + 1) %}
+                {% if p == current_page %}
+                <span class="current-page">{{ p }}</span>
+                {% else %}
+                <a href="#" onclick="loadPage({{ p }}); return false;" class="btn">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if current_page < total_pages %}
+            <a href="#" onclick="loadPage({{ current_page+1 }}); return false;" class="btn">Next &raquo;</a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
 <!-- Add User Modal -->
 <div id="addModal" class="modal">
     <div class="modal-content">

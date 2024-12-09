@@ -36,8 +36,9 @@ A modern web application for user management built with Flask and SQLite, contai
 
 Before you begin, ensure you have installed:
 
-- Docker (version 20.10 or newer)
-- Docker Compose (version 1.29 or newer)
+- Docker
+- Docker Compose
+- Git
 
 ## 2. Setup
 

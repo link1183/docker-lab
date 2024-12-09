@@ -1,15 +1,9 @@
-// Track user to be deleted
 let userToDelete = null;
 
-/**
- * Show a modal dialog
- * @param {string} modalId - The ID of the modal to show
- */
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
     modal.classList.add("show");
-    // Add escape key listener when modal is shown
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
         hideModal(modalId);
@@ -18,10 +12,6 @@ function showModal(modalId) {
   }
 }
 
-/**
- * Hide a modal dialog
- * @param {string} modalId - The ID of the modal to hide
- */
 function hideModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
@@ -33,72 +23,125 @@ function hideModal(modalId) {
   }
 }
 
-/**
- * Refresh the users table with new data
- * @param {Array} users - Array of user objects
- */
-function updateUsersTable(users) {
-  const tbody = document.querySelector("table tbody");
-  tbody.innerHTML = users
-    .map(
-      (user) => `
-        <tr>
-            <td>${user[0]}</td>
-            <td>${user[1]}</td>
-            <td>${user[2]}</td>
-            <td>
-                <button class="btn btn-warning" 
-                    onclick="populateEditForm('${user[0]}', '${user[1]}', '${user[2]}')">
-                    Edit
-                </button>
-                <button class="btn btn-danger" 
-                    onclick="showDeleteConfirmation('${user[0]}', '${user[1]}')">
-                    Delete
-                </button>
-            </td>
-        </tr>
-    `,
-    )
-    .join("");
+function loadPage(page) {
+  fetch(`/users?page=${page}`, {
+    headers: {
+      Accept: "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        showNotification(data.error, "error");
+        return;
+      }
+      updateUsersTable(data.users);
+      updatePagination(data.current_page, data.total_pages);
+    })
+    .catch((error) => {
+      showNotification("Error loading users", "error");
+      console.error("Error:", error);
+    });
 }
 
-/**
- * Show a notification message
- * @param {string} message - Message to display
- * @param {string} type - 'success' or 'error'
- */
-function showNotification(message, type = "success") {
-  const container = document.querySelector(".container");
+function updateUsersTable(users, currentPage, totalPages) {
+  const container = document.getElementById("users-container");
+  let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${users
+                  .map(
+                    (user) => `
+                    <tr>
+                        <td>${user[0]}</td>
+                        <td>${user[1]}</td>
+                        <td>${user[2]}</td>
+                        <td>
+                            <button class="btn btn-warning" 
+                                onclick="populateEditForm('${user[0]}', '${user[1]}', '${user[2]}')">
+                                Edit
+                            </button>
+                            <button class="btn btn-danger" 
+                                onclick="showDeleteConfirmation('${user[0]}', '${user[1]}')">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `,
+                  )
+                  .join("")}
+            </tbody>
+        </table>
+    `;
 
-  // Remove existing notifications
-  const existingMessage = container.querySelector(
-    ".success-message, .error-message",
-  );
-  if (existingMessage) {
-    existingMessage.remove();
+  if (totalPages > 1) {
+    html += `<div class="pagination">
+            ${
+              currentPage > 1
+                ? `<a href="#" onclick="loadPage(${currentPage - 1}); return false;" class="btn">&laquo; Previous</a>`
+                : ""
+            }
+            
+            ${Array.from({ length: totalPages }, (_, i) => i + 1)
+              .map((p) =>
+                p === currentPage
+                  ? `<span class="current-page">${p}</span>`
+                  : `<a href="#" onclick="loadPage(${p}); return false;" class="btn">${p}</a>`,
+              )
+              .join("")}
+            
+            ${
+              currentPage < totalPages
+                ? `<a href="#" onclick="loadPage(${currentPage + 1}); return false;" class="btn">Next &raquo;</a>`
+                : ""
+            }
+        </div>`;
   }
 
-  // Create and insert new notification
-  const messageDiv = document.createElement("div");
-  messageDiv.className =
-    type === "success" ? "success-message" : "error-message";
-  messageDiv.textContent = message;
-
-  // Insert after the navigation
-  const nav = container.querySelector(".nav");
-  nav.insertAdjacentElement("afterend", messageDiv);
-
-  // Auto-remove after 3 seconds
-  setTimeout(() => {
-    messageDiv.style.opacity = "0";
-    setTimeout(() => messageDiv.remove(), 300);
-  }, 3000);
+  container.innerHTML = html;
 }
 
-/**
- * Handle form submission with AJAX
- * @param {Event} event - Form submission event
- */
+function updatePagination(currentPage, totalPages) {
+  if (totalPages <= 1) return;
+
+  const pagination = document.createElement("div");
+  pagination.className = "pagination";
+  let html = "";
+
+  if (currentPage > 1) {
+    html += `<a href="#" onclick="loadPage(${currentPage - 1}); return false;" class="btn">&laquo; Previous</a>`;
+  }
+
+  for (let p = 1; p <= totalPages; p++) {
+    if (p === currentPage) {
+      html += `<span class="current-page">${p}</span>`;
+    } else {
+      html += `<a href="#" onclick="loadPage(${p}); return false;" class="btn">${p}</a>`;
+    }
+  }
+
+  if (currentPage < totalPages) {
+    html += `<a href="#" onclick="loadPage(${currentPage + 1}); return false;" class="btn">Next &raquo;</a>`;
+  }
+
+  pagination.innerHTML = html;
+  const container = document.getElementById("users-container");
+  const existingPagination = container.querySelector(".pagination");
+  if (existingPagination) {
+    container.replaceChild(pagination, existingPagination);
+  } else {
+    container.appendChild(pagination);
+  }
+}
+
 function handleFormSubmit(event) {
   event.preventDefault();
   const form = event.target;
@@ -109,12 +152,7 @@ function handleFormSubmit(event) {
     method: form.method,
     body: formData,
   })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
+    .then((response) => response.json())
     .then((data) => {
       if (data.error) {
         showNotification(data.error, "error");
@@ -133,21 +171,12 @@ function handleFormSubmit(event) {
     });
 }
 
-/**
- * Show delete confirmation modal
- * @param {string} userId - The ID of the user to delete
- * @param {string} userName - The name of the user to delete
- */
 function showDeleteConfirmation(userId, userName) {
   userToDelete = userId;
-  const nameElement = document.getElementById("deleteUserName");
-  nameElement.textContent = userName;
+  document.getElementById("deleteUserName").textContent = userName;
   showModal("deleteModal");
 }
 
-/**
- * Handle the actual deletion after confirmation
- */
 function handleDeleteConfirmation() {
   if (!userToDelete) return;
 
@@ -156,12 +185,7 @@ function handleDeleteConfirmation() {
   fetch(`/users/${userToDelete}/delete`, {
     method: "POST",
   })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
+    .then((response) => response.json())
     .then((data) => {
       if (data.error) {
         showNotification(data.error, "error");
@@ -179,12 +203,6 @@ function handleDeleteConfirmation() {
     });
 }
 
-/**
- * Populate the edit form with user data
- * @param {string} userId - The user's ID
- * @param {string} name - The user's name
- * @param {string} email - The user's email
- */
 function populateEditForm(userId, name, email) {
   document.getElementById("edit-id").value = userId;
   document.getElementById("edit-name").value = name;
@@ -192,9 +210,30 @@ function populateEditForm(userId, name, email) {
   showModal("editModal");
 }
 
-// Initialize all event listeners when the DOM is loaded
+function showNotification(message, type = "success") {
+  const container = document.querySelector(".container");
+  const existingMessage = container.querySelector(
+    ".success-message, .error-message",
+  );
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+
+  const messageDiv = document.createElement("div");
+  messageDiv.className =
+    type === "success" ? "success-message" : "error-message";
+  messageDiv.textContent = message;
+
+  const nav = container.querySelector(".nav");
+  nav.insertAdjacentElement("afterend", messageDiv);
+
+  setTimeout(() => {
+    messageDiv.style.opacity = "0";
+    setTimeout(() => messageDiv.remove(), 300);
+  }, 3000);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
-  // Handle modal background clicks
   const modals = document.querySelectorAll(".modal");
   modals.forEach((modal) => {
     modal.addEventListener("click", function (event) {
@@ -204,7 +243,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Handle close buttons
   const closeButtons = document.querySelectorAll(".close");
   closeButtons.forEach((button) => {
     button.addEventListener("click", function () {
@@ -215,13 +253,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Handle form submissions
   const forms = document.querySelectorAll("form");
   forms.forEach((form) => {
     form.addEventListener("submit", handleFormSubmit);
   });
 
-  // Handle delete confirmation
   const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
   if (confirmDeleteBtn) {
     confirmDeleteBtn.addEventListener("click", handleDeleteConfirmation);

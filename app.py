@@ -55,33 +55,54 @@ def welcome():
 
 @app.route("/users")
 def get_users():
-    """Enhanced user display page."""
-    logger.debug("Fetching users from database.")
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+    offset = (page - 1) * per_page
+
     try:
         with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, name, email FROM users")
+            cursor.execute("SELECT COUNT(*) FROM users")
+            total_users = cursor.fetchone()[0]
+            cursor.execute(
+                "SELECT id, name, email FROM users LIMIT ? OFFSET ?", (per_page, offset)
+            )
             users = cursor.fetchall()
+
+        total_pages = (total_users + per_page - 1) // per_page
+
+        if request.headers.get("Accept") == "application/json":
+            return jsonify(
+                {
+                    "users": users,
+                    "current_page": page,
+                    "total_pages": total_pages,
+                    "total_users": total_users,
+                }
+            )
 
         return render_template(
             "users.html",
             users=users,
+            current_page=page,
+            total_pages=total_pages,
+            total_users=total_users,
             env=os.getenv("ENV", "production"),
             success=request.args.get("success"),
             error=request.args.get("error"),
         )
     except sqlite3.Error as e:
         logger.error(f"Database error: {e}")
+        error_msg = "Failed to fetch users from the database"
+        if request.headers.get("Accept") == "application/json":
+            return jsonify({"error": error_msg}), 500
         return render_template(
-            "users.html",
-            error="Failed to fetch users from the database",
-            env=os.getenv("ENV", "production"),
+            "users.html", error=error_msg, env=os.getenv("ENV", "production")
         )
 
 
 @app.route("/users/add", methods=["POST"])
 def add_user():
-    """Add a new user."""
     try:
         with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
@@ -90,8 +111,6 @@ def add_user():
                 (request.form["name"], request.form["email"]),
             )
             conn.commit()
-
-            # Fetch updated user list
             cursor.execute("SELECT id, name, email FROM users")
             users = cursor.fetchall()
 
