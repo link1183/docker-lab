@@ -1,0 +1,3 @@
+**/*.db
+db/dev-data.db
+db/prod-data.db
