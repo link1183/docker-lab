@@ -1,0 +1,26 @@
+services:
+  app-dev:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "8001:8000"
+    environment:
+      - DB_PATH=/app/db/dev-data.db
+      - ENV=dev
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./db:/app/db
+
+  app-prod:
+    build:
+      context: .
+      target: prod
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_PATH=/app/db/prod-data.db
+      - ENV=production
+      - LOG_LEVEL=WARNING
+    volumes:
+      - ./db:/app/db
