@@ -94,16 +94,20 @@ docker compose logs -f app-dev app-prod
 
 We init our app with a bash script. In root folder it's init-db.sh file.
 In development, we use exec the app.py file using:
-```python
+
+``` python
 python app.py
 ```
-Flask output a message to told us not using this in production because it lunch a development server. 
+
+Flask output a message to told us not using this in production because it lunch a development server.
 You can see this warning if you run ``docker compose up``:
-> [!WARNING]  
-> app-dev-1   | INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+
+> [!WARNING]
+> app\-dev\-1 \| INFO:werkzeug:WARNING: This is a development server\. Do not use it in a production deployment\. Use a production WSGI server instead\.
 
 In production we use Gunicorn to lunch our server. Gunicorn ist a python server for flasks app. In our case we init it in the init-db.sh:
-```sh
+
+``` sh
 exec gunicorn --bind 0.0.0.0:8000 \
 		--workers 4 \
 		--access-logfile - \
@@ -111,26 +115,32 @@ exec gunicorn --bind 0.0.0.0:8000 \
 		--capture-output \
 		app:app
 ```
+
 Gunicorn allows us to create workers to manage the tasks in queue. It's better when there's many people on the same app like in production.
 
 #### 4.2 Environments vars
-Each environment has is own vars. This vars are used to change db data, dependencies and frontend. They are listed in the docker-compose.yaml
-Data
-Interface
-Logs
 
-* **Flask**: Lightweight Python web framework
-    * Route handling
-    * Template rendering
-    * Static file serving
-* **SQLite**: File-based relational database
-    * SQL schema management
-    * Data persistence
-    * Transaction support
-* **Python Libraries**:
-    * `sqlite3`: Database operations
-    * `logging`: Application logging
-    * `os`: Environment and path management
+Each environment has is own vars. This vars are used to change db data, dependencies and frontend. They are listed in the docker-compose.yaml.
+
+<br>
+| DEV | PROD |
+| --- | ---- |
+| <span class="colour" style="color:rgb(191, 199, 213)"> </span><span class="colour" style="color:rgb(137, 221, 255)">environment</span><span class="colour" style="color:rgb(191, 199, 213)">:</span><br><span class="colour" style="color:rgb(191, 199, 213)">  - </span><span class="colour" style="color:rgb(191, 199, 213)">DB\_PATH=/app/db/dev-data.db</span><br><span class="colour" style="color:rgb(191, 199, 213)">  - </span><span class="colour" style="color:rgb(191, 199, 213)">ENV=development</span><br><span class="colour" style="color:rgb(191, 199, 213)">  - </span><span class="colour" style="color:rgb(191, 199, 213)">LOG\_LEVEL=DEBUG</span> | <span style="color: #bfc7d5;"> </span><span style="color: #89ddff;">environment</span><span style="color: #bfc7d5;">:</span><br><span style="color: #bfc7d5;">  - </span><span style="color: #bfc7d5;">DB\_PATH=/app/db/prod-data.db</span><br><span style="color: #bfc7d5;">  - </span><span style="color: #bfc7d5;">ENV=production</span><br><span style="color: #bfc7d5;">  - </span><span style="color: #bfc7d5;">LOG\_LEVEL=WARNING</span> |
+<br>
+
+#### 4.3 Datas
+
+In dev, we try to break the system with specific data specials chars like é,.,`. You can see the list of the users in:[http://localhost:8000/users](http://localhost:8000/users)
+In production, there's real data with "normal" names.
+
+#### 4.4 Interface
+
+There's some differences in the GUI. We display the title of the environment. It is not something you would do in a real context, but it is done here to give a visual distinction between the development and the production environnement.
+
+#### 4.5 Log level
+
+In development, we have to resolve a lot of problems so we logs most of the events. In production, we have less logs because the it would have no bug normally.
+You can see this logs if you run the app not in background tasks ``docker composer up``
 
 ### 4.2 Environment-Specific Architecture
 
