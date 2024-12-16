@@ -14,7 +14,7 @@ COPY ./public /app/public/
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy init script
+# Copy init SCRIPT
 COPY init-db.sh /app/
 RUN chmod +x /app/init-db.sh
 
