@@ -6,63 +6,61 @@ A modern web application for user management built with Flask and SQLite, contai
 
 1. [Prerequisites](#1-prerequisites)
 2. [Setup](#2-setup)
-    1. [Clone Repository](#21-clone-repository)
-    2. [Build and Run](#22-build-and-run)
-    3. [Access Application](#23-access-application)
-    4. [Managing Application](#24-managing-application)
+   1. [Clone Repository](#21-clone-repository)
+   2. [Build and Run](#22-build-and-run)
+   3. [Access Application](#23-access-application)
+   4. [Managing Application](#24-managing-application)
 3. [Features](#3-features)
-4. [Architecture](#4-architecture)
-    1. [Technical Stack](#41-technical-stack)
-        * [Frontend](#frontend)
-        * [Backend](#backend)
-    2. [Environment-Specific Architecture](#42-environment-specific-architecture)
-        * [Development Environment](#development-environment-app-dev)
-        * [Production Environment](#production-environment-app-prod)
-    3. [Docker Architecture](#43-docker-architecture)
-        * [Container Structure](#container-structure)
-        * [Shared Resources](#shared-resources)
-    4. [Data Flow](#44-data-flow)
-    5. [Security Considerations](#45-security-considerations)
-5. [Project Structure](#5-project-structure)
-6. [Environment Variables](#6-environment-variables)
-7. [Development](#7-development)
-    1. [Database Initialization](#71-database-initialization)
-    2. [Adding New Features](#72-adding-new-features)
-8. [Troubleshooting](#8-troubleshooting)
-    1. [Common Issues](#81-common-issues)
-    2. [Getting Help](#82-getting-help)
+4. [Environment-Specifics](#4-environment-specifics)
+   1. [Launching Server](#41-launching-server)
+   2. [Environment Variables](#42-environments-vars)
+   3. [Data](#43-data)
+   4. [Frontend](#44-frontend)
+   5. [Log Level](#45-log-level)
+5. [Environment-Specific Architecture](#5-environment-specific-architecture)
+   1. [Development Environment](#51-development-environment-app-dev)
+   2. [Production Environment](#52-production-environment-app-prod)
+6. [Docker Architecture](#6-docker-architecture)
+   1. [Container Structure](#61-container-structure)
+   2. [Shared Resources](#62-shared-resources)
+7. [Data Flow](#7-data-flow)
+8. [Project Structure](#8-project-structure)
+9. [Environment Variables](#9-environment-variables)
+10. [Development](#10-development)
+    1. [Database Initialization](#101-database-initialization)
+    2. [Adding New Features](#102-adding-new-features)
 
 ## 1\. Prerequisites
 
 Before you begin, ensure you have installed:
 
-* [Docker](https://docs.docker.com/engine/install/)
-* [Docker Compose](https://docs.docker.com/compose/)
-* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Docker](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 ## 2\. Setup
 
 ### 2.1 Clone Repository
 
-``` sh
+```sh
 git clone https://github.com/link1183/docker-lab
 cd docker-lab
 ```
 
 ### 2.2 Build and Run
 
-``` sh
+```sh
 docker compose up -d --build
 ```
 
 ### 2.3 Access Application
 
-* Production: [http://localhost:8000](http://localhost:8000)
-* Development: [http://localhost:8001](http://localhost:8001)
+- Production: [http://localhost:8000](http://localhost:8000)
+- Development: [http://localhost:8001](http://localhost:8001)
 
 ### 2.4 Managing Application
 
-``` sh
+```sh
 # Stop the application
 docker compose down
 
@@ -75,39 +73,42 @@ docker compose logs -f app-dev app-prod
 
 ## 3\. Features
 
-* **User Management Interface**:
-    * View all users in a clean, responsive table
-    * Add new users with a modal form
-    * Edit existing users with pre-populated forms
-    * Delete users with confirmation
-* **Real-time Updates**:
-    * AJAX-powered operations (no page refreshes)
-    * Instant feedback with notifications
-    * Dynamic table updates
-* **Environment-Specific Configurations**:
-    * Development environment optimized for debugging
-    * Production environment optimized for performance and security
+- **User Management Interface**:
+  - View all users in a clean, responsive table
+  - Add new users with a modal form
+  - Edit existing users with pre-populated forms
+  - Delete users with confirmation
+- **Real-time Updates**:
+  - AJAX-powered operations (no page refreshes)
+  - Instant feedback with notifications
+  - Dynamic table updates
+- **Environment-Specific Configurations**:
+  - Development environment optimized for debugging
+  - Production environment optimized for performance and security
 
 ## 4\. Environment\-Specifics
 
 #### 4.1 Launching server
 
-We init our app with a bash script. In root folder it's init-db.sh file.
-In development, we use exec the app.py file using:
+The application is launched using the script `init.sh`.
 
-``` python
+In a development environnement (defined by the environnement variable `$ENV`), the server is launched using the following command:
+
+```bash
 python app.py
 ```
 
-Flask output a message to told us not using this in production because it lunch a development server.
-You can see this warning if you run ``docker compose up``:
+Running the command `python3 app.py` starts a Flask development server, which gives a warning.
+You can see this warning if you run the command `docker compose logs app-dev -f`, or `docker compose up` if the containers aren't launched.
 
-> [!WARNING]
-> app\-dev\-1 \| INFO:werkzeug:WARNING: This is a development server\. Do not use it in a production deployment\. Use a production WSGI server instead\.
+```
+app-dev-1 | INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+```
 
-In production we use Gunicorn to lunch our server. Gunicorn ist a python server for flasks app. In our case we init it in the init-db.sh:
+In production we use Gunicorn, which is the official Flask production server, to launch our server.
+Gunicorn allows us to define multiple parameters, such as the number of workers running.
 
-``` sh
+```sh
 exec gunicorn --bind 0.0.0.0:8000 \
 		--workers 4 \
 		--access-logfile - \
@@ -116,11 +117,9 @@ exec gunicorn --bind 0.0.0.0:8000 \
 		app:app
 ```
 
-Gunicorn allows us to create workers to manage the tasks in queue. It's better when there's many people on the same app like in production.
-
 #### 4.2 Environments vars
 
-Each environment has is own vars. This vars are used to change db data, dependencies and frontend. They are listed in the docker-compose.yaml.
+Each environment has is own variables. Those variables are used to change the data imported in the database, the dependencies, and some visual modifications on the frontend. They are listed in the file `docker-compose.yaml`.
 
 <br>
 | DEV | PROD |
@@ -128,86 +127,88 @@ Each environment has is own vars. This vars are used to change db data, dependen
 | <span class="colour" style="color:rgb(191, 199, 213)"> </span><span class="colour" style="color:rgb(137, 221, 255)">environment</span><span class="colour" style="color:rgb(191, 199, 213)">:</span><br><span class="colour" style="color:rgb(191, 199, 213)">  - </span><span class="colour" style="color:rgb(191, 199, 213)">DB\_PATH=/app/db/dev-data.db</span><br><span class="colour" style="color:rgb(191, 199, 213)">  - </span><span class="colour" style="color:rgb(191, 199, 213)">ENV=development</span><br><span class="colour" style="color:rgb(191, 199, 213)">  - </span><span class="colour" style="color:rgb(191, 199, 213)">LOG\_LEVEL=DEBUG</span> | <span style="color: #bfc7d5;"> </span><span style="color: #89ddff;">environment</span><span style="color: #bfc7d5;">:</span><br><span style="color: #bfc7d5;">  - </span><span style="color: #bfc7d5;">DB\_PATH=/app/db/prod-data.db</span><br><span style="color: #bfc7d5;">  - </span><span style="color: #bfc7d5;">ENV=production</span><br><span style="color: #bfc7d5;">  - </span><span style="color: #bfc7d5;">LOG\_LEVEL=WARNING</span> |
 <br>
 
-#### 4.3 Datas
+#### 4.3 Data
 
-In dev, we try to break the system with specific data specials chars like é,.,`. You can see the list of the users in:[http://localhost:8000/users](http://localhost:8000/users)
+In the development environment, we try to break the system with some specials chars like é,.,`.
 In production, there's real data with "normal" names.
 
-#### 4.4 Interface
+The list of users can be found at the following URL: [http://localhost:8000/users](http://localhost:8000/users)
 
-There's some differences in the GUI. We display the title of the environment. It is not something you would do in a real context, but it is done here to give a visual distinction between the development and the production environnement.
+#### 4.4 Frontend
+
+An environnement variable is used to display the environment on the frontend. It is not something you would do in a real context, but it is done here to give a visual distinction between the development and the production environnements.
 
 #### 4.5 Log level
 
-In development, we have to resolve a lot of problems so we logs most of the events. In production, we have less logs because the it would have no bug normally.
-You can see this logs if you run the app not in background tasks ``docker composer up``
+In the development environment, it is important to give as many logs as possible, such as access logs, debugs logs and the likes. In the production environment, we don't need as many logs, so we only display the access logs.
+Those logs can be seen with the command `docker compose logs app-prod -f` for the production environment, or `docker compose logs app-dev -f` for the development environment.
 
 ### 4.2 Environment-Specific Architecture
 
 #### Development Environment (`app-dev`)
 
-* **Server**: Flask Development Server
-    * Built-in reloader
-    * Detailed debugging information
-    * Development-oriented error pages
-* **Configuration**:
-    * DEBUG level logging
-    * Development-specific database with test data
-    * Port 8001 exposed
-* **Features**:
-    * Extended error messages
-    * Development-friendly debugging
-    * Mock data for testing
-    * Direct code execution
+- **Server**: Flask Development Server
+  - Built-in reloader
+  - Detailed debugging information
+  - Development-oriented error pages
+- **Configuration**:
+  - DEBUG level logging
+  - Development-specific database with test data
+  - Port 8001 exposed
+- **Features**:
+  - Extended error messages
+  - Development-friendly debugging
+  - Mock data for testing
+  - Direct code execution
 
 #### Production Environment (`app-prod`)
 
-* **Server**: Gunicorn WSGI Server
-    * 4 worker processes
-    * Production-grade performance
-    * Process management
-    * Error handling
-* **Security**:
-    * Non-root user execution
-    * Restricted permissions
-    * Minimal dependencies
-* **Configuration**:
-    * WARNING level logging
-    * Production database
-    * Port 8000 exposed
-    * Output capture for logging
-* **Features**:
-    * Optimized for performance
-    * Process management
-    * Load balancing
-    * Production logging
+- **Server**: Gunicorn WSGI Server
+  - 4 worker processes
+  - Production-grade performance
+  - Process management
+  - Error handling
+- **Security**:
+  - Non-root user execution
+  - Restricted permissions
+  - Minimal dependencies
+- **Configuration**:
+  - WARNING level logging
+  - Production database
+  - Port 8000 exposed
+  - Output capture for logging
+- **Features**:
+  - Optimized for performance
+  - Process management
+  - Load balancing
+  - Production logging
 
 ### 4.3 Docker Architecture
 
 #### Container Structure
 
 1. **Base Image (Common)**:
-    * Python 3.11 slim image
-    * SQLite installation
-    * Core dependencies
-    * Application code
-    * Static files and templates
+   - Python 3.11 slim image
+   - SQLite installation
+   - Core dependencies
+   - Application code
+   - Static files and templates
 2. **Development Specifics**:
-    * Additional development dependencies
-    * Mock data initialization
-    * Flask development server
-    * Debug-level logging
+   - Additional development dependencies
+   - Mock data initialization
+   - Flask development server
+   - Debug-level logging
 3. **Production Specifics**:
-    * Gunicorn WSGI server
-    * Production data initialization
-    * Non-root user execution
-    * Warning-level logging
+   - Gunicorn WSGI server
+   - Production data initialization
+   - Non-root user execution
+   - Warning-level logging
 
 #### Shared Resources
 
-* **Volumes**:
-    * `db-data`: Persistent storage for SQLite databases
-    * Mounted at `/app/db` in both containers
+- **Volumes**:
+  - `db-data`: Persistent storage for SQLite databases
+  - Mounted at `/app/db` in both containers
 
 ### 4.4 Data Flow
 
@@ -240,10 +241,10 @@ You can see this logs if you run the app not in background tasks ``docker compos
 
 The application uses these environment variables:
 
-* `DB_PATH`: Path to the SQLite database file
-* `ENV`: Environment type (`development` or `production`)
-* `LOG_LEVEL`: Logging level (`DEBUG`, `INFO`, or `WARNING`)
-* `SQL_FILE`: SQL file for database initialization
+- `DB_PATH`: Path to the SQLite database file
+- `ENV`: Environment type (`development` or `production`)
+- `LOG_LEVEL`: Logging level (`DEBUG`, `INFO`, or `WARNING`)
+- `SQL_FILE`: SQL file for database initialization
 
 ## 7\. Development
 
@@ -251,17 +252,17 @@ The application uses these environment variables:
 
 Database initialization happens at container startup:
 
-* Development data is loaded from `db/dev-data.sql`
-* Production data is loaded from `db/prod-data.sql`
-* Data persists between container restarts via Docker volumes
+- Development data is loaded from `db/dev-data.sql`
+- Production data is loaded from `db/prod-data.sql`
+- Data persists between container restarts via Docker volumes
 
 ### 7.2 Adding New Features
 
 1. Frontend:
-    * Templates are in `public/templates/`
-    * CSS styles are split into layout and components
-    * JavaScript handles all dynamic interactions
+   - Templates are in `public/templates/`
+   - CSS styles are split into layout and components
+   - JavaScript handles all dynamic interactions
 2. Backend:
-    * Add new routes in `app.py`
-    * Update SQL scripts in `db/` for new schemas
-    * Follow the existing pattern for AJAX responses
+   - Add new routes in `app.py`
+   - Update SQL scripts in `db/` for new schemas
+   - Follow the existing pattern for AJAX responses
