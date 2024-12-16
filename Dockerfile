@@ -15,8 +15,8 @@ COPY ./public /app/public/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy init SCRIPT
-COPY init-db.sh /app/
-RUN chmod +x /app/init-db.sh
+COPY init.sh /app/
+RUN chmod +x /app/init.sh
 
 # Stage 2: Development Environment (Dev)
 FROM base AS dev
@@ -36,7 +36,7 @@ ENV SQL_FILE=dev-data.sql
 RUN mkdir -p /app/db && chmod 777 /app/db
 
 # Command for the development environment
-CMD ["/app/init-db.sh"]
+CMD ["/app/init.sh"]
 
 # Stage 3: Production Environment
 FROM base AS prod
@@ -59,4 +59,4 @@ RUN adduser --disabled-password --gecos '' appuser && \
 USER appuser
 
 # Use the init script which will handle both DB init and server startup
-CMD ["/app/init-db.sh"]
+CMD ["/app/init.sh"]
