@@ -121,11 +121,9 @@ exec gunicorn --bind 0.0.0.0:8000 \
 
 Each environment has is own variables. Those variables are used to change the data imported in the database, the dependencies, and some visual modifications on the frontend. They are listed in the file `docker-compose.yaml`.
 
-<br>
-| DEV | PROD |
-| --- | ---- |
-| <span class="colour" style="color:rgb(191, 199, 213)"> </span><span class="colour" style="color:rgb(137, 221, 255)">environment</span><span class="colour" style="color:rgb(191, 199, 213)">:</span><br><span class="colour" style="color:rgb(191, 199, 213)">  - </span><span class="colour" style="color:rgb(191, 199, 213)">DB\_PATH=/app/db/dev-data.db</span><br><span class="colour" style="color:rgb(191, 199, 213)">  - </span><span class="colour" style="color:rgb(191, 199, 213)">ENV=development</span><br><span class="colour" style="color:rgb(191, 199, 213)">  - </span><span class="colour" style="color:rgb(191, 199, 213)">LOG\_LEVEL=DEBUG</span> | <span style="color: #bfc7d5;"> </span><span style="color: #89ddff;">environment</span><span style="color: #bfc7d5;">:</span><br><span style="color: #bfc7d5;">  - </span><span style="color: #bfc7d5;">DB\_PATH=/app/db/prod-data.db</span><br><span style="color: #bfc7d5;">  - </span><span style="color: #bfc7d5;">ENV=production</span><br><span style="color: #bfc7d5;">  - </span><span style="color: #bfc7d5;">LOG\_LEVEL=WARNING</span> |
-<br>
+| DEV                                                                                        | PROD                                                                                         |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| environment:<br> - DB_PATH=/app/db/dev-data.db<br> - ENV=development<br> - LOG_LEVEL=DEBUG | environment:<br> - DB_PATH=/app/db/prod-data.db<br> - ENV=production<br> - LOG_LEVEL=WARNING |
 
 #### 4.3 Data
 
