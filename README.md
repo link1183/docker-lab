@@ -2,6 +2,31 @@
 
 A modern web application for managing users, built with Flask and SQLite, featuring separate development and production environments. The system provides a complete CRUD interface within a Docker-containerized setup.
 
+## Table of Contents
+
+1. [Quick Start](#quick-start)
+   - [Prerequisites](#prerequisites)
+   - [Basic Commands](#basic-commands)
+2. [Core Features](#core-features)
+3. [Development vs Production Environments](#development-vs-production-environments)
+   - [Development Environment](#development-environment-port-8001)
+   - [Production Environment](#production-environment-port-8000)
+   - [Visual Distinctions](#visual-distinctions)
+   - [Log Level Differences](#log-level-differences)
+   - [Data Differences](#data-differences)
+4. [Technical Architecture](#technical-architecture)
+   - [Docker Container Structure](#docker-container-structure)
+   - [Project Layout](#project-layout)
+   - [Data Persistence](#data-persistence)
+5. [Environment Configuration](#environment-configuration)
+   - [Environment Variables](#environment-variables)
+   - [Server Launch Methods](#server-launch-methods)
+6. [Dependencies](#dependencies)
+   - [Production Dependencies](#production-dependencies)
+   - [Development Dependencies](#development-dependencies)
+7. [Development Guide](#development-guide)
+   - [Adding New Features](#adding-new-features)
+
 ## Quick Start
 
 ```bash
