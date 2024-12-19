@@ -19,9 +19,9 @@ Development: http://localhost:8001
 
 ### Prerequisites
 
-- Docker
-- Docker Compose
-- Git
+- [Git](https://git-scm.com/downloads)
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
 ### Basic Commands
 
@@ -81,6 +81,51 @@ docker compose logs -f app-prod   # Production logs
   - Restricted permissions
   - Minimal dependency set
   - Production-appropriate logging
+
+### Visual Distinctions
+
+- An environment variable is used to display the current environment on the frontend
+- This visual indicator helps distinguish between development and production environments
+- While not recommended for real production systems, it's implemented here for demonstration purposes
+- The environment type can be verified by visiting:
+  - Development: http://localhost:8001/users
+  - Production: http://localhost:8000/users
+
+### Log Level Differences
+
+- **Development Environment**:
+
+  - Extensive logging including access logs and debug information
+  - View logs with: `docker compose logs app-dev -f`
+  - Detailed error messages and stack traces
+  - You'll see the Flask development server warning:
+    ```
+    WARNING: This is a development server. Do not use it in a production deployment.
+    Use a production WSGI server instead.
+    ```
+
+- **Production Environment**:
+  - Minimal logging with only essential access logs
+  - View logs with: `docker compose logs app-prod -f`
+  - Production-appropriate error handling
+  - Logs will show Gunicorn worker processes starting:
+    ```
+    [2024-xx-xx xx:xx:xx +0000] [xxx] [INFO] Starting gunicorn 20.x.x
+    [2024-xx-xx xx:xx:xx +0000] [xxx] [INFO] Listening at: http://0.0.0.0:8000
+    [2024-xx-xx xx:xx:xx +0000] [xxx] [INFO] Using worker: sync
+    [2024-xx-xx xx:xx:xx +0000] [xxx] [INFO] Booting worker with pid: xxx
+    ```
+
+### Data Differences
+
+- **Development**:
+
+  - Contains test data with special characters (é, ., `)
+  - Designed to test system robustness
+
+- **Production**:
+  - Contains realistic user data
+  - Uses standard character sets
 
 ## Technical Architecture
 
@@ -151,6 +196,26 @@ exec gunicorn --bind 0.0.0.0:8000 \
     --capture-output \
     app:app
 ```
+
+## Dependencies
+
+### Production Dependencies
+
+(from `requirements.txt`)
+
+- **Flask (3.1.0)**: Lightweight web framework for building the application
+- **Gunicorn (23.0.0)**: Production-grade WSGI server for deploying Flask applications
+- **Email-validator (2.2.0)**: Library for validating email addresses in user data
+- **Bleach (6.2.0)**: Secure HTML sanitization library for cleaning user input
+
+### Development Dependencies
+
+(from `requirements-dev.txt`)
+
+- **Pytest (8.3.4)**: Testing framework for writing and executing unit tests
+- **Black (24.10.0)**: Code formatter to maintain consistent Python code style
+- **Flake8 (7.1.1)**: Code linter that checks Python code for style and programming errors
+- **Pylint (3.3.2)**: Static code analysis tool for checking code quality and finding errors
 
 ## Development Guide
 
