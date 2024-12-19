@@ -24,7 +24,10 @@ A modern web application for managing users, built with Flask and SQLite, featur
 6. [Dependencies](#dependencies)
    - [Production Dependencies](#production-dependencies)
    - [Development Dependencies](#development-dependencies)
-7. [Development Guide](#development-guide)
+7. [Database Access](#database-access)
+   - [Accessing Development Database](#accessing-development-database)
+   - [Accessing Production Database](#accessing-production-database)
+8. [Development Guide](#development-guide)
    - [Adding New Features](#adding-new-features)
 
 ## Quick Start
@@ -113,8 +116,8 @@ docker compose logs -f app-prod   # Production logs
 - This visual indicator helps distinguish between development and production environments
 - While not recommended for real production systems, it's implemented here for demonstration purposes
 - The environment type can be verified by visiting:
-  - Development: http://localhost:8001/users
-  - Production: http://localhost:8000/users
+  - Development: http://localhost:8001
+  - Production: http://localhost:8000
 
 ### Log Level Differences
 
@@ -144,13 +147,16 @@ docker compose logs -f app-prod   # Production logs
 ### Data Differences
 
 - **Development**:
-
   - Contains test data with special characters (é, ., `)
   - Designed to test system robustness
+
+The development data can be seen at [the following link](http://localhost:8001/users).
 
 - **Production**:
   - Contains realistic user data
   - Uses standard character sets
+
+The production data can be seen at [the following link](http://localhost:8000/users).
 
 ## Technical Architecture
 
@@ -241,6 +247,61 @@ exec gunicorn --bind 0.0.0.0:8000 \
 - **Black (24.10.0)**: Code formatter to maintain consistent Python code style
 - **Flake8 (7.1.1)**: Code linter that checks Python code for style and programming errors
 - **Pylint (3.3.2)**: Static code analysis tool for checking code quality and finding errors
+
+## Database Access
+
+You can directly access and query the SQLite databases inside the containers. Each environment has its own database file.
+
+### Accessing Development Database
+
+1. Access the development container:
+
+```bash
+docker compose exec app-dev sh
+```
+
+2. Access the SQLite database:
+
+```bash
+sqlite3 /app/db/dev-data.db
+```
+
+### Accessing Production Database
+
+1. Access the production container:
+
+```bash
+docker compose exec app-prod sh
+```
+
+2. Access the SQLite database:
+
+```bash
+sqlite3 /app/db/prod-data.db
+```
+
+### Useful SQLite Commands
+
+Once in the SQLite prompt:
+
+```sql
+-- List all tables
+.tables
+
+-- Show table schema
+.schema users
+
+-- Make output prettier
+.mode column
+.headers on
+
+-- Query examples
+SELECT * FROM users;
+SELECT * FROM users WHERE id = 1;
+
+-- Exit SQLite
+.quit
+```
 
 ## Development Guide
 
