@@ -1,3 +1,5 @@
+Devs: Adrien Gunther, Claire Prodolliet, Thomas Burkhalter
+
 # SQLite-Flask User Management System
 
 A modern web application for managing users, built with Flask and SQLite, featuring separate development and production environments. The system provides a complete CRUD interface within a Docker-containerized setup.
